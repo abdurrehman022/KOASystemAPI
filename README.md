@@ -2,6 +2,10 @@
 
 This is a Flask-based API for predicting knee osteoarthritis severity using a pre-trained deep learning model. The API allows users to upload images of their knee X-rays and receive predictions regarding the severity of osteoarthritis.
 
+## Linked Repositories
+- **[Main Repository](https://github.com/abdurrehman022/KOASystem)**: Machine Learning Model and Training for the KOA Classification System
+- **[Flutter App Repository](https://github.com/sohaibkhan209/KOASystemFlutter)**: Mobile application for the KOA Classification System
+
 ## Table of Contents
 
 1. **Installation**
