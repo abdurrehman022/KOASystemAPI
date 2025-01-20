@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import CORS
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import numpy as np
@@ -8,6 +9,9 @@ import io
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Enable CORS
+CORS(app)  # Apply CORS to the entire app
 
 # Load the pre-trained model (ensure the model path is correct)
 model_path = 'kneeosteoarthritis_957.28.h5'  # Model path
@@ -46,14 +50,18 @@ def predict():
     try:
         image_bytes = file.read()
         img_array = load_and_preprocess_image(image_bytes)
-        predictions = model.predict(img_array)
-        predicted_class_index = np.argmax(predictions[0])
+        predictions = model.predict(img_array)[0]
+        predicted_class_index = np.argmax(predictions)
         predicted_class = classes[predicted_class_index]
-        confidence_score = float(predictions[0][predicted_class_index]) * 100  # Convert to percentage
+        confidence_score = float(predictions[predicted_class_index]) * 100  # Convert to percentage
+
+        # Create a dictionary of class labels and their corresponding confidence scores
+        confidence_scores = {classes[i]: f"{float(predictions[i]) * 100:.2f}%" for i in range(len(classes))}
 
         return jsonify({
             'prediction': predicted_class,
-            'confidence': f"{confidence_score:.2f}%"  # Format as percentage
+            'confidence': f"{confidence_score:.2f}%",  # Format as percentage
+            'all_confidences': confidence_scores
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -64,4 +72,4 @@ def index():
     return "Welcome to the Knee Osteoarthritis Prediction API!"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(port=5005)
